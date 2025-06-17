@@ -9,6 +9,9 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
+# DB用ディレクトリの作成
+RUN mkdir -p /app/data
+
 # アプリ本体をコピー
 COPY . /app
 

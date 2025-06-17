@@ -68,8 +68,8 @@ def render_modal_form(content, csrf_token, action_url):
 @bottle_app.post('/login')
 def login():
     s = request.environ.get('beaker.session')
-    username = request.forms.get('username')
-    password = request.forms.get('password')
+    username = request.forms.getunicode('username')
+    password = request.forms.getunicode('password')
     if username == 'admin' and password == ADMIN_PASSWORD:
         s['user'] = username
         s.save()
@@ -146,14 +146,14 @@ def form():
 @bottle_app.post('/form')
 def save_form():
     s = request.environ.get('beaker.session')
-    if s.get('user') != 'admin' or request.forms.get('csrf_token') != s.get('csrf_token'):
+    if s.get('user') != 'admin' or request.forms.getunicode('csrf_token') != s.get('csrf_token'):
         return "不正なアクセス"
     required_fields = ["username", "author", "address", "contact1_name", "contact1_tel", "contact1_email",
                        "contact2_name", "contact2_tel", "contact2_email",
                        "contact3_name", "contact3_tel", "contact3_email",
                        "normal_hours", "normal_method", "after_hours", "after_method"]
     for field in required_fields:
-        if not request.forms.get(field):
+        if not request.forms.getunicode(field):
             return f"{field} が未入力です"
     with sqlite3.connect(DB_FILE) as conn:
         conn.execute('''
@@ -165,12 +165,12 @@ def save_form():
                 timestamp
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
             (
-                request.forms.get('username'), request.forms.get('author'), request.forms.get('address'),
-                request.forms.get('contact1_name'), request.forms.get('contact1_tel'), request.forms.get('contact1_email'),
-                request.forms.get('contact2_name'), request.forms.get('contact2_tel'), request.forms.get('contact2_email'),
-                request.forms.get('contact3_name'), request.forms.get('contact3_tel'), request.forms.get('contact3_email'),
-                request.forms.get('normal_hours'), request.forms.get('normal_method'),
-                request.forms.get('after_hours'), request.forms.get('after_method'),
+                request.forms.getunicode('username'), request.forms.getunicode('author'), request.forms.getunicode('address'),
+                request.forms.getunicode('contact1_name'), request.forms.getunicode('contact1_tel'), request.forms.getunicode('contact1_email'),
+                request.forms.getunicode('contact2_name'), request.forms.getunicode('contact2_tel'), request.forms.getunicode('contact2_email'),
+                request.forms.getunicode('contact3_name'), request.forms.getunicode('contact3_tel'), request.forms.getunicode('contact3_email'),
+                request.forms.getunicode('normal_hours'), request.forms.getunicode('normal_method'),
+                request.forms.getunicode('after_hours'), request.forms.getunicode('after_method'),
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             ))
     redirect('/')
@@ -228,12 +228,12 @@ def update_entry(id):
                 timestamp=?
             WHERE id=?
         ''', (
-            request.forms.get('username'), request.forms.get('author'), request.forms.get('address'),
-            request.forms.get('contact1_name'), request.forms.get('contact1_tel'), request.forms.get('contact1_email'),
-            request.forms.get('contact2_name'), request.forms.get('contact2_tel'), request.forms.get('contact2_email'),
-            request.forms.get('contact3_name'), request.forms.get('contact3_tel'), request.forms.get('contact3_email'),
-            request.forms.get('normal_hours'), request.forms.get('normal_method'),
-            request.forms.get('after_hours'), request.forms.get('after_method'),
+            request.forms.getunicode('username'), request.forms.getunicode('author'), request.forms.getunicode('address'),
+            request.forms.getunicode('contact1_name'), request.forms.getunicode('contact1_tel'), request.forms.getunicode('contact1_email'),
+            request.forms.getunicode('contact2_name'), request.forms.getunicode('contact2_tel'), request.forms.getunicode('contact2_email'),
+            request.forms.getunicode('contact3_name'), request.forms.getunicode('contact3_tel'), request.forms.getunicode('contact3_email'),
+            request.forms.getunicode('normal_hours'), request.forms.getunicode('normal_method'),
+            request.forms.getunicode('after_hours'), request.forms.getunicode('after_method'),
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'), id
         ))
     redirect('/')

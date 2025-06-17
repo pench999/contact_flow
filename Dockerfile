@@ -15,4 +15,4 @@ RUN mkdir -p /app/data
 # アプリ本体をコピー
 COPY . /app
 
-CMD ["python", "app.py"]
+CMD ["python", "contact.py"]

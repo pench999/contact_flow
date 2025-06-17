@@ -17,7 +17,7 @@ session_opts = {
     'session.data_dir': './session_data'
 }
 app = SessionMiddleware(bottle_app, session_opts)
-DB_FILE = 'contact_chart.db'
+DB_FILE = './data/contact_chart.db'
 ADMIN_PASSWORD = 'changeme'
 
 def init_db():

@@ -6,8 +6,8 @@
 
 ## インストール
 1. git cloneする
-2. ボリューム用ディレクトリを作成する
-   `# mkdir -p ./data
+2. ボリューム用ディレクトリを作成する  
+   `# mkdir -p ./data`
 4. コンテナをビルドする  
    `# podman build --no-cache -t my-bottle-app .`
 5. コンテナ起動する  

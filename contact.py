@@ -51,8 +51,9 @@ def render_modal_form(content, csrf_token, action_url):
     tmpl = SimpleTemplate('''
         <div id="modal" style="display:block; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); font-family:Arial, sans-serif;" onclick="if(event.target.id==='modal'){ window.location.href='/'; }">
           <div style="background:#f9f9f9; border-radius:8px; box-shadow:0 0 20px rgba(0,0,0,0.2); margin:5% auto; padding:30px; width:40%; position:relative;" onclick="event.stopPropagation();">
+            <meta charset="utf-8">
             <h2 style="margin-bottom:20px; text-align:center; color:#333;">連絡体制入力</h2>
-            <form method="post" action="{{action_url}}" style="display:flex; flex-direction:column; gap:10px;">
+            <form method="post" action="{{action_url}}" saccept-charset="UTF-8" style="display:flex; flex-direction:column; gap:10px;">
                 <input type="hidden" name="csrf_token" value="{{csrf_token}}" />
                 {{!content}}
                 <div style="display:flex; justify-content:space-between;">
@@ -148,6 +149,9 @@ def save_form():
     s = request.environ.get('beaker.session')
     if s.get('user') != 'admin' or request.forms.getunicode('csrf_token') != s.get('csrf_token'):
         return "不正なアクセス"
+    # デバッグ出力: フォームから受け取った値を確認
+    print("DEBUG username:", request.forms.getunicode('username'), flush=True)
+    print("DEBUG author:", request.forms.getunicode('author'), flush=True)
     required_fields = ["username", "author", "address", "contact1_name", "contact1_tel", "contact1_email",
                        "contact2_name", "contact2_tel", "contact2_email",
                        "contact3_name", "contact3_tel", "contact3_email",
@@ -266,6 +270,7 @@ def index():
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="utf-8">
             <title>顧客別連絡体制図</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -285,6 +290,13 @@ def index():
                             <span>{{user}}</span> <a href="/logout" class="btn btn-sm btn-secondary">ログアウト</a>
                             % if user == 'admin':
                                 <a href="#" onclick="showModalForm(); return false;" class="btn btn-sm btn-success">＋ 新規登録</a>
+                                <form method="get" action="/admin/export" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">CSVエクスポート</button>
+                                </form>
+                                <form method="post" action="/admin/import" enctype="multipart/form-data" style="display:inline;">
+                                    <input type="file" name="csv_file" accept=".csv" required class="form-control form-control-sm d-inline-block w-auto" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success">CSVインポート</button>
+                                </form>
                             % end
                         % end
                     </div>
@@ -447,7 +459,7 @@ def admin_import():
                 ''', values)
     return "インポートが完了しました"
 
-
 if __name__ == '__main__':
     init_db()
-    run(app=app, host='0.0.0.0', port=8080, debug=True)
+    run(app=app, host='0.0.0.0', port=8081, debug=True)
+

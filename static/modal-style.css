@@ -1,0 +1,21 @@
+#modal * {
+    font-family: "Yu Gothic", "游ゴシック", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif !important;
+}
+
+#modal label {
+    font-size: 14px;
+    color: #333;
+}
+
+#modal input,
+#modal select,
+#modal button {
+    font-size: 14px;
+}
+
+#modal h2 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+

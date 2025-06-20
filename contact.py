@@ -1,4 +1,4 @@
-from bottle import Bottle, template, request, redirect, run, response, SimpleTemplate
+from bottle import Bottle, template, request, redirect, run, response, SimpleTemplate, static_file
 from beaker.middleware import SessionMiddleware
 import sqlite3
 import os
@@ -66,6 +66,10 @@ def render_modal_form(content, csrf_token, action_url):
     ''')
     return tmpl.render(content=content, csrf_token=csrf_token, action_url=action_url)
 
+@bottle_app.route('/static/<filepath:path>')
+def server_static(filepath):
+    return static_file(filepath, root='./static')
+
 @bottle_app.post('/login')
 def login():
     s = request.environ.get('beaker.session')
@@ -123,15 +127,23 @@ def form():
         <label>ユーザー名 <input name="username" required /></label>
         <label>構築担当者 <input name="author" required /></label>
         <label>住所 <input name="address" required /></label>
-        <label>第一連絡先名 <input name="contact1_name" required /></label>
-        <label>第一連絡先電話 <input name="contact1_tel" required /></label>
-        <label>第一連絡先Email <input name="contact1_email" required /></label>
-        <label>第二連絡先名 <input name="contact2_name" required /></label>
-        <label>第二連絡先電話 <input name="contact2_tel" required /></label>
-        <label>第二連絡先Email <input name="contact2_email" required /></label>
-        <label>第三連絡先名 <input name="contact3_name" required /></label>
-        <label>第三連絡先電話 <input name="contact3_tel" required /></label>
-        <label>第三連絡先Email <input name="contact3_email" required /></label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label>第一連絡先名 <input name="contact1_name" required /></label>
+          <label>電話 <input name="contact1_tel" required /></label>
+          <label>Email <input name="contact1_email" required /></label>
+       </div>
+
+       <div style="display: flex; gap: 10px; align-items: center;">
+         <label>第二連絡先名 <input name="contact2_name" required /></label>
+         <label>電話 <input name="contact2_tel" required /></label>
+         <label>Email <input name="contact2_email" required /></label>
+       </div>
+
+       <div style="display: flex; gap: 10px; align-items: center;">
+         <label>第三連絡先名 <input name="contact3_name" required /></label>
+         <label>電話 <input name="contact3_tel" required /></label>
+         <label>Email <input name="contact3_email" required /></label>
+       </div>
         <label>通常受付時間 <input name="normal_hours" required /></label>
         <label>連絡方法 <input name="normal_method" required /></label>
         <label>受付時間外の連絡要否 
@@ -272,6 +284,7 @@ def index():
         <head>
             <meta charset="utf-8">
             <title>顧客別連絡体制図</title>
+            <link rel="stylesheet" href="/static/modal-style.css">
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         </head>

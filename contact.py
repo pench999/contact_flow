@@ -114,7 +114,7 @@ def detail(id):
             <p>連絡方法: {{row[14]}}</p>
             <p>通常受付時間外: {{row[15]}}</p>
             <p>通常受付時間外連絡方法: {{row[16]}}</p>
-            <p>登録日時: {{row[17]}}</p>
+            <p>登録日時: {{row[18]}}</p>
             % if user == 'admin':
                 <p>
                     <a href="/editform/{{row[0]}}">[編集]</a>

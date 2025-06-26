@@ -49,7 +49,14 @@ def init_db():
 
 def render_modal_form(content, csrf_token, action_url):
     tmpl = SimpleTemplate('''
-        <div id="modal" style="display:block; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); font-family:Arial, sans-serif;" onclick="if(event.target.id==='modal'){ window.location.href='/'; }">
+    <html lang="ja">
+    <head>
+        <title>顧客別連絡体制図</title>
+        <link rel="stylesheet" href="/static/modal-style.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </head>
+        <div id="modal" style="display:block; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7);" onclick="if(event.target.id==='modal'){ window.location.href='/'; }">
           <div style="background:#f9f9f9; border-radius:8px; box-shadow:0 0 20px rgba(0,0,0,0.2); margin:5% auto; padding:30px; width:40%; position:relative;" onclick="event.stopPropagation();">
             <meta charset="utf-8">
             <h2 style="margin-bottom:20px; text-align:center; color:#333;">連絡体制入力</h2>
@@ -207,18 +214,27 @@ def edit_form(id):
         <label>ユーザー名 <input name="username" value="{row[1]}" required /></label>
         <label>構築担当者 <input name="author" value="{row[2]}" required /></label>
         <label>住所 <input name="address" value="{row[3]}" required /></label>
-        <label>第一連絡先名 <input name="contact1_name" value="{row[4]}" required /></label>
-        <label>第一連絡先電話 <input name="contact1_tel" value="{row[5]}" required /></label>
-        <label>第一連絡先Email <input name="contact1_email" value="{row[6]}" required /></label>
-        <label>第二連絡先名 <input name="contact2_name" value="{row[7]}" required /></label>
-        <label>第二連絡先電話 <input name="contact2_tel" value="{row[8]}" required /></label>
-        <label>第二連絡先Email <input name="contact2_email" value="{row[9]}" required /></label>
-        <label>第三連絡先名 <input name="contact3_name" value="{row[10]}" required /></label>
-        <label>第三連絡先電話 <input name="contact3_tel" value="{row[11]}" required /></label>
-        <label>第三連絡先Email <input name="contact3_email" value="{row[12]}" required /></label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label>第一連絡先名 <input name="contact1_name" value="{row[4]}" required /></label>
+          <label>第一連絡先電話 <input name="contact1_tel" value="{row[5]}" required /></label>
+          <label>第一連絡先Email <input name="contact1_email" value="{row[6]}" required /></label>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label>第二連絡先名 <input name="contact2_name" value="{row[7]}" required /></label>
+          <label>第二連絡先電話 <input name="contact2_tel" value="{row[8]}" required /></label>
+          <label>第二連絡先Email <input name="contact2_email" value="{row[9]}" required /></label>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label>第三連絡先名 <input name="contact3_name" value="{row[10]}" required /></label>
+          <label>第三連絡先電話 <input name="contact3_tel" value="{row[11]}" required /></label>
+          <label>第三連絡先Email <input name="contact3_email" value="{row[12]}" required /></label>
+        </div>
+
         <label>通常受付時間 <input name="normal_hours" value="{row[13]}" required /></label>
         <label>連絡方法 <input name="normal_method" value="{row[14]}" required /></label>
-        <label>受付時間外の連絡要否 
+        <label>受付時間外の連絡要否
             <select name="after_hours" required>
                 <option value="要" {'selected' if row[15]=='要' else ''}>要</option>
                 <option value="否" {'selected' if row[15]=='否' else ''}>否</option>
@@ -278,89 +294,8 @@ def index():
         else:
             cur.execute("SELECT id, username FROM contacts ORDER BY id DESC")
         userlist = cur.fetchall()
-    return template('''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>顧客別連絡体制図</title>
-            <link rel="stylesheet" href="/static/modal-style.css">
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        </head>
-        <body class="bg-light">
-            <div class="container py-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h1 class="h3">顧客別連絡体制図</h1>
-                    <div>
-                        % if not user:
-                            <form method="post" action="/login" class="d-flex gap-2">
-                                <input name="username" class="form-control form-control-sm" placeholder="ユーザー名" />
-                                <input name="password" type="password" class="form-control form-control-sm" placeholder="パスワード" />
-                                <input type="submit" class="btn btn-sm btn-primary" value="ログイン" />
-                            </form>
-                        % else:
-                            <span>{{user}}</span> <a href="/logout" class="btn btn-sm btn-secondary">ログアウト</a>
-                            % if user == 'admin':
-                                <a href="#" onclick="showModalForm(); return false;" class="btn btn-sm btn-success">＋ 新規登録</a>
-                                <form method="get" action="/admin/export" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">CSVエクスポート</button>
-                                </form>
-                                <form method="post" action="/admin/import" enctype="multipart/form-data" style="display:inline;">
-                                    <input type="file" name="csv_file" accept=".csv" required class="form-control form-control-sm d-inline-block w-auto" />
-                                    <button type="submit" class="btn btn-sm btn-outline-success">CSVインポート</button>
-                                </form>
-                            % end
-                        % end
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <form method="get" action="/" class="input-group mb-3">
-                            <input type="text" name="q" class="form-control" placeholder="名前で検索" value="{{query or ''}}">
-                            <button class="btn btn-outline-secondary" type="submit">検索</button>
-                        </form>
-                        <ul class="list-group">
-                            % for id, name in userlist:
-                                <li class="list-group-item"><a href="#" onclick="showDetails({{id}}); return false;">{{name}}</a></li>
-                            % end
-                        </ul>
-                    </div>
-                    <div class="col-md-8" id="details">
-                        <h4>ユーザーを選択してください</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content" id="modal-content">
-                </div>
-              </div>
-            </div>
-            <script>
-                async function showDetails(id) {
-                    const res = await fetch(`/detail/${id}`);
-                    const html = await res.text();
-                    document.getElementById('details').innerHTML = html;
-                }
-                function showModalForm(id=null) {
-                    const modal = new bootstrap.Modal(document.getElementById('modal'));
-                    if (id) {
-                        fetch('/editform/' + id).then(res => res.text()).then(html => {
-                            document.getElementById('modal-content').innerHTML = html;
-                            modal.show();
-                        });
-                    } else {
-                        fetch('/form').then(res => res.text()).then(html => {
-                            document.getElementById('modal-content').innerHTML = html;
-                            modal.show();
-                        });
-                    }
-                }
-            </script>
-        </body>
-        </html>
-    ''', user=user, userlist=userlist, query=query)
+        query = request.query.q or ''
+    return template('index', user=user, userlist=userlist, query=query)
 
 @bottle_app.get('/api/detail/<id:int>')
 def api_detail(id):

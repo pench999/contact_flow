@@ -1,21 +1,79 @@
-#modal * {
+/* モーダル全体にベースのフォントとサイズを強制 */
+#modal, #modal * {
     font-family: "Yu Gothic", "游ゴシック", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif !important;
-}
-
-#modal label {
-    font-size: 14px;
+    font-size: 12px !important;
     color: #333;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
-#modal input,
-#modal select,
-#modal button {
-    font-size: 14px;
-}
-
+/* タイトル */
 #modal h2 {
-    font-size: 18px;
+    font-size: 18px !important;
     font-weight: bold;
-    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ラベルと入力の縦並び整形 */
+#modal label {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* 入力フィールド */
+#modal input,
+#modal select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    width: 100%;
+}
+
+/* ボタン配置エリア */
+#modal form > div:last-child {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+/* ボタン全般 */
+#modal input[type="submit"],
+#modal button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    width: auto;
+    gap: 10px;
+}
+
+/* 保存ボタン */
+#modal input[type="submit"] {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+/* 閉じるボタン */
+#modal button {
+    background-color: #f44336;
+    color: #fff;
+}
+
+#modal.custom-modal {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.7);
+  font-family: "Yu Gothic", "游ゴシック", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  z-index: 1050;
 }
 

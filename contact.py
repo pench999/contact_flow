@@ -60,7 +60,7 @@ def render_modal_form(content, csrf_token, action_url):
     tmpl = SimpleTemplate('''
     <html lang="ja">
     <head>
-        <title>顧客別連絡体制図</title>
+        <title>顧客別連絡体制くん</title>
         <link rel="stylesheet" href="/static/modal-style.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -121,8 +121,8 @@ def detail(id):
             <p>第三連絡先: {{row[10]}} / TEL: {{row[11]}} / Email: {{row[12]}}</p>
             <p>通常受付時間: {{row[13]}}</p>
             <p>連絡方法: {{row[14]}}</p>
-            <p>通常受付時間外: {{row[15]}}</p>
-            <p>通常受付時間外連絡方法: {{row[16]}}</p>
+            <p>時間外連絡: {{row[15]}}</p>
+            <p>時間外連絡方法: {{row[16]}}</p>
             <p>時間外第一連絡先: {{row[19]}} / TEL: {{row[20]}} / Email: {{row[21]}}</p>
             <p>時間外第二連絡先: {{row[22]}} / TEL: {{row[23]}} / Email: {{row[24]}}</p>
             <p>時間外第三連絡先: {{row[25]}} / TEL: {{row[26]}} / Email: {{row[27]}}</p>
@@ -165,13 +165,13 @@ def form():
        </div>
         <label>通常受付時間 <input name="normal_hours" required /></label>
         <label>連絡方法 <input name="normal_method" required /></label>
-        <label>受付時間外の連絡要否 
+        <label>時間外の連絡要否 
             <select name="after_hours" required>
                 <option value="要">要</option>
                 <option value="否">否</option>
             </select>
         </label>
-        <label>受付時間外連絡方法 <input name="after_method" required /></label>
+        <label>時間外連絡方法 <input name="after_method" required /></label>
         <div style="display: flex; gap: 10px; align-items: center;">
           <label>時間外第一連絡先名 <input name="after_contact1_name" required /></label>
           <label>電話 <input name="after_contact1_tel" required /></label>
@@ -273,13 +273,13 @@ def edit_form(id):
 
         <label>通常受付時間 <input name="normal_hours" value="{row[13]}" required /></label>
         <label>連絡方法 <input name="normal_method" value="{row[14]}" required /></label>
-        <label>受付時間外の連絡要否
+        <label>時間外の連絡要否
             <select name="after_hours" required>
                 <option value="要" {'selected' if row[15]=='要' else ''}>要</option>
                 <option value="否" {'selected' if row[15]=='否' else ''}>否</option>
             </select>
         </label>
-        <label>受付時間外連絡方法 <input name="after_method" value="{row[16]}" required /></label>
+        <label>時間外連絡方法 <input name="after_method" value="{row[16]}" required /></label>
         <div style="display: flex; gap: 10px; align-items: center;">
           <label>時間外第一連絡先名 <input name="after_contact1_name" value="{row[19]}" required /></label>
           <label>時間外第一連絡先電話 <input name="after_contact1_tel" value="{row[20]}" required /></label>

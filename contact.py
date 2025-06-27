@@ -390,7 +390,7 @@ def api_detail(id):
     response.content_type = 'application/json; charset=UTF-8'
     return get_contact_detail(id)
 
-@bottle_app.get('/api/list')
+@bottle_app.post('/api/list')
 def api_list():
     with sqlite3.connect(DB_FILE) as conn:
         conn.row_factory = sqlite3.Row

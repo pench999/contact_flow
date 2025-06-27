@@ -357,18 +357,38 @@ def index():
         query = request.query.q or ''
     return template('index', user=user, userlist=userlist, query=query)
 
-@bottle_app.get('/api/detail/<id:int>')
-def api_detail(id):
+def get_contact_detail(id):
     with sqlite3.connect(DB_FILE) as conn:
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         cur.execute("SELECT * FROM contacts WHERE id = ?", (id,))
         row = cur.fetchone()
+
     if not row:
         response.status = 404
-        return json.dumps({"error": "データが見つかりません"}, ensure_ascii=False)
+        return json.dumps({"text": "❌ データが見つかりません"}, ensure_ascii=False)
+
+    # データを整形してMattermost向けメッセージ作成
+    detail = f"""\
+📄 **連絡先詳細**
+- ユーザー名: {row["username"]}
+- 運用担当者: {row["author"]}
+- 住所: {row["address"]}
+- 第一連絡先: {row["contact1_name"]} / {row["contact1_tel"]} / {row["contact1_email"]}
+- 第二連絡先: {row["contact2_name"]} / {row["contact2_tel"]} / {row["contact2_email"]}
+- 第三連絡先: {row["contact3_name"]} / {row["contact3_tel"]} / {row["contact3_email"]}
+- 通常受付時間: {row["normal_hours"]}（連絡方法: {row["normal_method"]}）
+- 時間外連絡: {row["after_hours"]}（連絡方法: {row["after_method"]}）
+- 時間外第一連絡先: {row["after_contact1_name"]} / {row["after_contact1_tel"]} / {row["after_contact1_email"]}
+- 時間外第二連絡先: {row["after_contact2_name"]} / {row["after_contact2_tel"]} / {row["after_contact2_email"]}
+- 時間外第三連絡先: {row["after_contact3_name"]} / {row["after_contact3_tel"]} / {row["after_contact3_email"]}"""
+
+    return json.dumps({"text": detail}, ensure_ascii=False)
+
+@bottle_app.get('/api/detail/<id:int>')
+def api_detail(id):
     response.content_type = 'application/json; charset=UTF-8'
-    return json.dumps(dict(row), ensure_ascii=False)
+    return get_contact_detail(id)
 
 @bottle_app.get('/api/list')
 def api_list():
@@ -377,19 +397,41 @@ def api_list():
         cur = conn.cursor()
         cur.execute("SELECT id, username FROM contacts ORDER BY id DESC")
         rows = cur.fetchall()
-    response.content_type = 'application/json; charset=UTF-8'
-    return json.dumps({"contacts": [dict(r) for r in rows]}, ensure_ascii=False)
 
-@bottle_app.get('/api/search')
-def api_search():
-    keyword = request.query.get('q', '')
-    with sqlite3.connect(DB_FILE) as conn:
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM contacts WHERE username LIKE ? COLLATE NOCASE ORDER BY id DESC", ('%' + keyword + '%',))
-        rows = cur.fetchall()
+    if not rows:
+        response.status = 200
+        return json.dumps({"text": "📭 ユーザーが登録されていません"}, ensure_ascii=False)
+
+    # Mattermost表示用に整形
+    lines = ["📋 **ユーザー一覧**"]
+    for row in rows:
+        lines.append(f"- ID: {row['id']}, ユーザー名: {row['username']}")
+
+    message = "\n".join(lines)
+
     response.content_type = 'application/json; charset=UTF-8'
-    return json.dumps({"results": [dict(r) for r in rows]}, ensure_ascii=False)
+    return json.dumps({"text": message}, ensure_ascii=False)
+
+@bottle_app.post('/api/search')
+def api_search_use_detail():
+    text = request.forms.getunicode('text', '')
+    trigger = request.forms.getunicode('trigger_word', '')
+    keyword = text[len(trigger):].strip()
+
+    if not keyword:
+        return json.dumps({"text": "❗検索キーワードが指定されていません"}, ensure_ascii=False)
+
+    # usernameで部分一致検索し、最初のidを取得
+    with sqlite3.connect(DB_FILE) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT id FROM contacts WHERE username LIKE ? COLLATE NOCASE ORDER BY id DESC", ('%' + keyword + '%',))
+        row = cur.fetchone()
+
+    if not row:
+        return json.dumps({"text": f"🔍 「{keyword}」に一致するユーザーは見つかりませんでした"}, ensure_ascii=False)
+
+    response.content_type = 'application/json; charset=UTF-8'
+    return get_contact_detail(row[0])
 
 @bottle_app.get('/admin/export')
 def admin_export():

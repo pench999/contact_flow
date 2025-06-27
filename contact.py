@@ -43,7 +43,16 @@ def init_db():
                     after_hours TEXT,
                     after_method TEXT,
                     remarks TEXT,
-                    timestamp TEXT
+                    timestamp TEXT,
+                    after_contact1_name TEXT,
+                    after_contact1_tel TEXT,
+                    after_contact1_email TEXT,
+                    after_contact2_name TEXT,
+                    after_contact2_tel TEXT,
+                    after_contact2_email TEXT,
+                    after_contact3_name TEXT,
+                    after_contact3_tel TEXT,
+                    after_contact3_email TEXT
                 )
             ''')
 
@@ -114,6 +123,9 @@ def detail(id):
             <p>連絡方法: {{row[14]}}</p>
             <p>通常受付時間外: {{row[15]}}</p>
             <p>通常受付時間外連絡方法: {{row[16]}}</p>
+            <p>時間外第一連絡先: {{row[19]}} / TEL: {{row[20]}} / Email: {{row[21]}}</p>
+            <p>時間外第二連絡先: {{row[22]}} / TEL: {{row[23]}} / Email: {{row[24]}}</p>
+            <p>時間外第三連絡先: {{row[25]}} / TEL: {{row[26]}} / Email: {{row[27]}}</p>
             <p>登録日時: {{row[18]}}</p>
             % if user == 'admin':
                 <p>
@@ -160,6 +172,23 @@ def form():
             </select>
         </label>
         <label>受付時間外連絡方法 <input name="after_method" required /></label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label>時間外第一連絡先名 <input name="after_contact1_name" required /></label>
+          <label>電話 <input name="after_contact1_tel" required /></label>
+          <label>Email <input name="after_contact1_email" required /></label>
+       </div>
+
+       <div style="display: flex; gap: 10px; align-items: center;">
+         <label>時間外第二連絡先名 <input name="after_contact2_name" required /></label>
+         <label>電話 <input name="after_contact2_tel" required /></label>
+         <label>Email <input name="after_contact2_email" required /></label>
+       </div>
+
+       <div style="display: flex; gap: 10px; align-items: center;">
+         <label>時間外第三連絡先名 <input name="after_contact3_name" required /></label>
+         <label>電話 <input name="after_contact3_tel" required /></label>
+         <label>Email <input name="after_contact3_email" required /></label>
+       </div>
     '''
     return render_modal_form(content, csrf_token, '/form')
 
@@ -174,7 +203,11 @@ def save_form():
     required_fields = ["username", "author", "address", "contact1_name", "contact1_tel", "contact1_email",
                        "contact2_name", "contact2_tel", "contact2_email",
                        "contact3_name", "contact3_tel", "contact3_email",
-                       "normal_hours", "normal_method", "after_hours", "after_method"]
+                       "normal_hours", "normal_method", "after_hours", "after_method",
+                       "after_contact1_name", "after_contact1_tel", "after_contact1_email",
+                       "after_contact2_name", "after_contact2_tel", "after_contact2_email",
+                       "after_contact3_name", "after_contact3_tel", "after_contact3_email"
+                       ]
     for field in required_fields:
         if not request.forms.getunicode(field):
             return f"{field} が未入力です"
@@ -185,8 +218,11 @@ def save_form():
                 contact2_name, contact2_tel, contact2_email,
                 contact3_name, contact3_tel, contact3_email,
                 normal_hours, normal_method, after_hours, after_method,
+                after_contact1_name, after_contact1_tel, after_contact1_email,
+                after_contact2_name, after_contact2_tel, after_contact2_email,
+                after_contact3_name, after_contact3_tel, after_contact3_email,
                 timestamp
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
             (
                 request.forms.getunicode('username'), request.forms.getunicode('author'), request.forms.getunicode('address'),
                 request.forms.getunicode('contact1_name'), request.forms.getunicode('contact1_tel'), request.forms.getunicode('contact1_email'),
@@ -194,6 +230,9 @@ def save_form():
                 request.forms.getunicode('contact3_name'), request.forms.getunicode('contact3_tel'), request.forms.getunicode('contact3_email'),
                 request.forms.getunicode('normal_hours'), request.forms.getunicode('normal_method'),
                 request.forms.getunicode('after_hours'), request.forms.getunicode('after_method'),
+                request.forms.getunicode('after_contact1_name'), request.forms.getunicode('after_contact1_tel'), request.forms.getunicode('after_contact1_email'),
+                request.forms.getunicode('after_contact2_name'), request.forms.getunicode('after_contact2_tel'), request.forms.getunicode('after_contact2_email'),
+                request.forms.getunicode('after_contact3_name'), request.forms.getunicode('after_contact3_tel'), request.forms.getunicode('after_contact3_email'),
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             ))
     redirect('/')
@@ -241,6 +280,21 @@ def edit_form(id):
             </select>
         </label>
         <label>受付時間外連絡方法 <input name="after_method" value="{row[16]}" required /></label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label>時間外第一連絡先名 <input name="after_contact1_name" value="{row[19]}" required /></label>
+          <label>時間外第一連絡先電話 <input name="after_contact1_tel" value="{row[20]}" required /></label>
+          <label>時間外第一連絡先Email <input name="after_contact1_email" value="{row[21]}" required /></label>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label>時間外第二連絡先名 <input name="after_contact2_name" value="{row[22]}" required /></label>
+          <label>時間外第二連絡先電話 <input name="after_contact2_tel" value="{row[23]}" required /></label>
+          <label>時間外第二連絡先Email <input name="after_contact2_email" value="{row[24]}" required /></label>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label>時間外第三連絡先名 <input name="after_contact3_name" value="{row[25]}" required /></label>
+          <label>時間外第三連絡先電話 <input name="after_contact3_tel" value="{row[26]}" required /></label>
+          <label>時間外第三連絡先Email <input name="after_contact3_email" value="{row[27]}" required /></label>
+        </div>
     '''
     return render_modal_form(content, csrf_token, f'/edit/{id}')
 
@@ -257,6 +311,9 @@ def update_entry(id):
                 contact2_name=?, contact2_tel=?, contact2_email=?,
                 contact3_name=?, contact3_tel=?, contact3_email=?,
                 normal_hours=?, normal_method=?, after_hours=?, after_method=?,
+                after_contact1_name=?, after_contact1_tel=?, after_contact1_email=?,
+                after_contact2_name=?, after_contact2_tel=?, after_contact2_email=?,
+                after_contact3_name=?, after_contact3_tel=?, after_contact3_email=?,
                 timestamp=?
             WHERE id=?
         ''', (
@@ -266,6 +323,9 @@ def update_entry(id):
             request.forms.getunicode('contact3_name'), request.forms.getunicode('contact3_tel'), request.forms.getunicode('contact3_email'),
             request.forms.getunicode('normal_hours'), request.forms.getunicode('normal_method'),
             request.forms.getunicode('after_hours'), request.forms.getunicode('after_method'),
+            request.forms.getunicode('after_contact1_name'), request.forms.getunicode('after_contact1_tel'), request.forms.getunicode('after_contact1_email'),
+            request.forms.getunicode('after_contact2_name'), request.forms.getunicode('after_contact2_tel'), request.forms.getunicode('after_contact2_email'),
+            request.forms.getunicode('after_contact3_name'), request.forms.getunicode('after_contact3_tel'), request.forms.getunicode('after_contact3_email'),
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'), id
         ))
     redirect('/')
@@ -387,6 +447,15 @@ def admin_import():
                 row.get('normal_method', ''),
                 row.get('after_hours', ''),
                 row.get('after_method', ''),
+                row.get('after_contact1_name', ''),
+                row.get('after_contact1_tel', ''),
+                row.get('after_contact1_email', ''),
+                row.get('after_contact2_name', ''),
+                row.get('after_contact2_tel', ''),
+                row.get('after_contact2_email', ''),
+                row.get('after_contact3_name', ''),
+                row.get('after_contact3_tel', ''),
+                row.get('after_contact3_email', ''),
             ]
             if has_remarks:
                 values.append(row.get('remarks', ''))
@@ -394,16 +463,22 @@ def admin_import():
                 conn.execute('''
                     INSERT INTO contacts (username, author, address, contact1_name, contact1_tel, contact1_email,
                         contact2_name, contact2_tel, contact2_email, contact3_name, contact3_tel, contact3_email,
-                        normal_hours, normal_method, after_hours, after_method, remarks, timestamp)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        normal_hours, normal_method, after_hours, after_method, remarks, timestamp,
+                        after_contact1_name, after_contact1_tel, after_contact1_email,
+                        after_contact2_name, after_contact2_tel, after_contact2_email,
+                        after_contact3_name, after_contact3_tel, after_contact3_email)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', values)
             else:
                 values.append(datetime.now().isoformat())
                 conn.execute('''
                     INSERT INTO contacts (username, author, address, contact1_name, contact1_tel, contact1_email,
                         contact2_name, contact2_tel, contact2_email, contact3_name, contact3_tel, contact3_email,
-                        normal_hours, normal_method, after_hours, after_method, timestamp)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        normal_hours, normal_method, after_hours, after_method, timestamp,
+                        after_contact1_name, after_contact1_tel, after_contact1_email,
+                        after_contact2_name, after_contact2_tel, after_contact2_email,
+                        after_contact3_name, after_contact3_tel, after_contact3_email)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', values)
     return "インポートが完了しました"
 

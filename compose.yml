@@ -1,0 +1,16 @@
+services:
+  contact-flow:
+    build: .
+    container_name: contact-flow
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      PORT: "8080"
+      WEB_CONCURRENCY: "2"
+      CONTACT_FLOW_DB_FILE: /app/data/contact_chart.db
+      SESSION_DATA_DIR: /app/session_data
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
+    volumes:
+      - ./data:/app/data
+      - ./session_data:/app/session_data
+    restart: unless-stopped

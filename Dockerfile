@@ -1,18 +1,18 @@
 FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
-# 先に requirements.txt をコピーしてインストール
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# DB用ディレクトリの作成
-RUN mkdir -p /app/data
+RUN mkdir -p /app/data /app/session_data
 
-# アプリ本体をコピー
 COPY . /app
 
-CMD ["python", "contact.py"]
+ENV PORT=8080
+ENV CONTACT_FLOW_DB_FILE=/app/data/contact_chart.db
+ENV SESSION_DATA_DIR=/app/session_data
+
+EXPOSE 8080
+
+CMD ["sh", "-c", "python -c 'import contact; contact.init_db()' && gunicorn --bind 0.0.0.0:${PORT} --workers ${WEB_CONCURRENCY:-2} contact:app"]
